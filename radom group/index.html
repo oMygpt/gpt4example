@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>随机分组</title>
+  <style>
+    .group {
+      margin: 10px;
+      padding: 10px;
+      border: 1px solid;
+    }
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      resize: vertical;
+    }
+  </style>
+</head>
+<body>
+  <h1>学生随机分组</h1>
+  <label for="studentIds">学生学号 (每行一个):</label>
+  <textarea id="studentIds" placeholder="例如：\n1\n2\n3\n4\n5"></textarea>
+  <label for="numGroups">分组数量:</label>
+  <input type="number" id="numGroups" placeholder="例如：2">
+  <button onclick="generateGroups()">生成分组</button>
+  <div id="groupContainer"></div>
+
+  <script>
+    function randomGrouping(studentIds, numGroups) {
+      studentIds.sort(() => Math.random() - 0.5);
+      const groupSize = Math.floor(studentIds.length / numGroups);
+      const remainder = studentIds.length % numGroups;
+      const groups = [];
+
+      let currentIdx = 0;
+      for (let i = 0; i < numGroups; i++) {
+        const currentGroupSize = i < remainder ? groupSize + 1 : groupSize;
+        groups.push(studentIds.slice(currentIdx, currentIdx + currentGroupSize));
+        currentIdx += currentGroupSize;
+      }
+
+      return groups;
+    }
+
+    function generateGroups() {
+      const studentIdsInput = document.getElementById("studentIds").value;
+      const numGroupsInput = document.getElementById("numGroups").value;
+
+      if (!studentIdsInput || !numGroupsInput) {
+        alert("请确保输入了学生学号和分组数量");
+        return;
+      }
+
+      const studentIds = studentIdsInput.trim().split(/\s+/).map((id) => parseInt(id, 10));
+      const numGroups = parseInt(numGroupsInput, 10);
+      const groups = randomGrouping(studentIds, numGroups);
+
+      const groupContainer = document.getElementById("groupContainer");
+      groupContainer.innerHTML = "";
+
+      groups.forEach((group, index) => {
+        const groupDiv = document.createElement("div");
+        groupDiv.classList.add("group");
+        groupDiv.style.backgroundColor = `hsl(${(index * 360) / numGroups}, 100%, 90%)`;
+
+        const groupTitle = document.createElement("h2");
+        groupTitle.textContent = `组${index + 1}`;
+        groupDiv.appendChild(groupTitle);
+
+        const groupMembers = document.createElement("p");
+        groupMembers.textContent = group.join(", ");
+        groupDiv.appendChild(groupMembers);
+
+        groupContainer.appendChild(groupDiv);
+      });
+    }
+  </script>
+</body>
+</html>
